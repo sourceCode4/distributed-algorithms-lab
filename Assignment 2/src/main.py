@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Union
 
 from echoprocess import EchoProcess
-
+from GlobalState import GlobalState
 
 def load_addresses(path: Union[str, Path]) -> dict:
     """
@@ -32,11 +32,11 @@ async def run_process(pid: int):
     # Load addresses of all processes in the system
     addresses = load_addresses('resources/addresses.txt')
     # Start own process
-    p = EchoProcess(pid, addresses)
+    p = GlobalState(pid, addresses)
     # Start server for incomming connections
     await p.start_server()
     # Wait a bit for all processes to start up
-    await asyncio.sleep(1)
+    await asyncio.sleep(2)
     # Run algorithm until finished
     await p.run()
 
