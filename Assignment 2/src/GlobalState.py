@@ -1,5 +1,5 @@
 from abstractprocess import AbstractProcess, Message
-
+from random import shuffle, choice
 
 class GlobalState(AbstractProcess):
     """
@@ -11,7 +11,8 @@ class GlobalState(AbstractProcess):
     def __init__(self, idx: int, addresses: dict):
         super().__init__(idx, addresses)
         self.PROCESS_COUNT = len(self.addresses) + 1
-        self.send_buffer = list(addresses.keys())
+        self.send_buffer = list(addresses.keys()) * 2
+        shuffle(self.send_buffer)
         self.local_state = {k: (0, 0) for k in addresses.keys()}
         self.channel_state: dict[int, list[int]] = {k: [] for k in addresses.keys()}
         self.message_count = 0
@@ -25,14 +26,20 @@ class GlobalState(AbstractProcess):
 
     async def send(self, content: str, receiver: int):
         receiver_state = self.local_state[receiver]
+
+        if content != "marker":
+            self.message_count += 1
+            self.local_state[receiver] = (receiver_state[0] + 1, receiver_state[1])
+
         msg = Message(content, self.idx, receiver_state[0])
-        self.local_state[receiver] = (receiver_state[0] + 1, receiver_state[1])
         await self.send_message(msg, receiver)
+
         print(f"Sent message {msg.counter} to process #{receiver},\n"
               f"\tlocal state: {self.local_state}")
 
     async def record_and_send_markers(self):
         self.mark_count += 1
+
         # record local state
         local_state = f"process{self.idx}'s state = {self.local_state}"
         self.log += f'{local_state}\n'
@@ -71,8 +78,8 @@ class GlobalState(AbstractProcess):
             await self.send(f"msg{self.message_count}", receiver)
 
         # node 0 initializes
-        if self.idx == 0 and self.mark_count == 0:
+        if self.idx == 0 and self.message_count == 2:
             await self.record_and_send_markers()
 
-        self.running = self.mark_count < self.PROCESS_COUNT and \
+        self.running = self.mark_count < self.PROCESS_COUNT or \
                        len(self.send_buffer) != 0
