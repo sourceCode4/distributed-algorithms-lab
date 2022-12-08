@@ -10,15 +10,27 @@ services:
       - '9090:9090'
     environment:
       PID: 0
+    volumes:
+      - type: bind
+        source: ./logs/node0
+        target: /log
   node1:
     build: .
     ports:
       - '9091:9091'
     environment:
       PID: 1
+    volumes:
+      - type: bind
+        source: ./logs/node1
+        target: /log
   node2:
     build: .
     ports:
       - '9092:9092'
     environment:
       PID: 2
+    volumes:
+      - type: bind
+        source: ./logs/node2
+        target: /log

@@ -77,6 +77,11 @@ class AbstractProcess(ABC):
         self.addresses: dict = addresses
         self.host, self.port = self.addresses.pop(self.idx)
         self.buffer = MessageBuffer()
+        self.logStr: str = ''
+
+    def log(self, msg: str):
+        print(msg)
+        self.logStr += msg + '\n'
 
     @abstractmethod
     async def algorithm(self):
@@ -151,10 +156,9 @@ class AbstractProcess(ABC):
             print('Stopping server')
             # Wait a bit for a more graceful exit of all the nodes
             await asyncio.sleep(2)
-            # print(self.log)
-            # with open("LogFiles/Log" + str(self.idx) + ".txt", "w") as writer:
-            #     print("Loggin that shizzle")
-            #     writer.write(self.log)
+            with open(''.join([f"/log/log{self.idx}.txt"]), "w") as writer:
+                print("Loggin that shizzle")
+                writer.write(self.logStr)
             # Stop server
             self.server.close()
             print('Exiting')
