@@ -30,12 +30,11 @@ class GlobalState(AbstractProcess):
         if content != "marker":
             self.message_count += 1
             self.local_state[receiver] = (receiver_state[0] + 1, receiver_state[1])
-
+            print(f"SENT message {receiver_state[0]} to process #{receiver}, local state: {self.local_state}")
+        else:
+            print(f"MARKER SENT to {receiver}")
         msg = Message(content, self.idx, receiver_state[0])
         await self.send_message(msg, receiver)
-
-        print(f"Sent message {msg.counter} to process #{receiver},\n"
-              f"\tlocal state: {self.local_state}")
 
     async def record_and_send_markers(self):
         self.mark_count += 1
@@ -55,19 +54,18 @@ class GlobalState(AbstractProcess):
         content, sender, count = self.buffer.get().unpack()
 
         if content == "marker":
+            print(f"MARKER RECEIVED from {sender}")
             self.mark_count += 1
             self.record_channel(sender)
             if not self.recorded:
                 # assume it is empty
                 await self.record_and_send_markers()
         else:
+            print(f"RECEIVED message {count} from process #{sender}, local state: {self.local_state}")
             sender_state = self.local_state[sender]
             self.local_state[sender] = (sender_state[0], sender_state[1] + 1)
             if self.recorded:
                 self.channel_state[sender].append(count)
-
-        print(f"Received message {count} from process #{sender}, \n"
-              f"\tlocal state: {self.local_state}")
 
     async def algorithm(self):
         await self.handle_receive()
