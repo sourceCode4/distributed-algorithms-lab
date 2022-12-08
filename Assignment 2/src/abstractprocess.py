@@ -20,6 +20,9 @@ class Message:
         self.counter = counter
         self.content = content
 
+    def unpack(self) -> tuple[str, int, int]:
+        return self.content, self.sender, self.counter
+
     def encode(self) -> bytes:
         """
         Make sure we are serializable with EOF line ending
@@ -57,7 +60,7 @@ class MessageBuffer:
     def put(self, m: Message):
         self.messages.put(m)
 
-    def get(self):
+    def get(self) -> Message:
         return self.messages.get()
 
 
@@ -77,11 +80,7 @@ class AbstractProcess(ABC):
         self.addresses: dict = addresses
         self.host, self.port = self.addresses.pop(self.idx)
         self.buffer = MessageBuffer()
-        self.logStr: str = ''
-
-    def log(self, msg: str):
-        print(msg)
-        self.logStr += msg + '\n'
+        self.log: str = ''
 
     @abstractmethod
     async def algorithm(self):
@@ -158,7 +157,7 @@ class AbstractProcess(ABC):
             await asyncio.sleep(2)
             with open(''.join([f"/log/log{self.idx}.txt"]), "w") as writer:
                 print("Loggin that shizzle")
-                writer.write(self.logStr)
+                writer.write(self.log)
             # Stop server
             self.server.close()
             print('Exiting')

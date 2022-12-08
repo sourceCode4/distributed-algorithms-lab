@@ -1,6 +1,5 @@
 from abstractprocess import AbstractProcess, Message
-import random
-import operator
+
 
 class GlobalState(AbstractProcess):
     """
@@ -8,34 +7,72 @@ class GlobalState(AbstractProcess):
     Only the algorithm() function needs to be implemented.
     The function send_message(message, to) can be used to send asynchronous messages to other processes.
     """
+
     def __init__(self, idx: int, addresses: dict):
         super().__init__(idx, addresses)
-        self.local_state = [(0, 0)] * (len(self.addresses) + 1)
-        self.counter = 0
+        self.PROCESS_COUNT = len(self.addresses) + 1
+        self.send_buffer = list(addresses.keys())
+        self.local_state = {k: (0, 0) for k in addresses.keys()}
+        self.channel_state: dict[int, list[int]] = {k: [] for k in addresses.keys()}
+        self.message_count = 0
+        self.recorded = False
+        self.mark_count = 0
+
+    def record_channel(self, sender: int):
+        state = f'Channel {sender} -> {self.idx} = {self.channel_state[sender]}'
+        self.log += f'{state}\n'
+        print(state)
+
+    async def send(self, content: str, receiver: int):
+        receiver_state = self.local_state[receiver]
+        msg = Message(content, self.idx, receiver_state[0])
+        self.local_state[receiver] = (receiver_state[0] + 1, receiver_state[1])
+        await self.send_message(msg, receiver)
+        print(f"Sent message {msg.counter} to process #{receiver},\n"
+              f"\tlocal state: {self.local_state}")
+
+    async def record_and_send_markers(self):
+        self.mark_count += 1
+        # record local state
+        local_state = f"process{self.idx}'s state = {self.local_state}"
+        self.log += f'{local_state}\n'
+        print(local_state)
+
+        self.recorded = True
+        for pid in self.addresses.keys():
+            await self.send("marker", pid)
+
+    async def handle_receive(self):
+        if not self.buffer.has_messages(): return
+
+        content, sender, count = self.buffer.get().unpack()
+
+        if content == "marker":
+            self.mark_count += 1
+            self.record_channel(sender)
+            if not self.recorded:
+                # assume it is empty
+                await self.record_and_send_markers()
+        else:
+            sender_state = self.local_state[sender]
+            self.local_state[sender] = (sender_state[0], sender_state[1] + 1)
+            if self.recorded:
+                self.channel_state[sender].append(count)
+
+        print(f"Received message {count} from process #{sender}, \n"
+              f"\tlocal state: {self.local_state}")
 
     async def algorithm(self):
-        # Send a message up to 3 messages
-        if self.counter < 3:
-            # Compose message
-            msg = Message("Hello world", self.idx, self.counter)
-            to: int = random.choice(list(self.addresses.keys()))
-            await self.send_message(msg, to)
-            self.counter += 1
-            self.local_state[to] = (self.local_state[to][0] + 1, self.local_state[to][1])
-            self.log(f"{self.idx} Send message to {to}, message:{msg.counter}, local state: {self.local_state}")
+        await self.handle_receive()
 
-        # If we have a new message
-        if self.buffer.has_messages():
-            # Retrieve message
-            msg: Message = self.buffer.get()
-            if msg.content == "marker":
-                self.Bc = [[] for _ in range(len(self.addresses) + 1)]
-                
-            else:
-                self.local_state[msg.sender] = \
-                    (self.local_state[msg.sender][0], self.local_state[msg.sender][1] + 1)
-                self.log(f'{self.idx} Got message from process {msg.sender}, '
-                         f'counter: {msg.counter}, local_state: {self.local_state}')
+        # send a msg
+        if len(self.send_buffer) != 0:
+            receiver = self.send_buffer.pop()
+            await self.send(f"msg{self.message_count}", receiver)
 
-        if not self.buffer.has_messages() and self.counter >= 3:
-            self.running = False
+        # node 0 initializes
+        if self.idx == 0 and self.mark_count == 0:
+            await self.record_and_send_markers()
+
+        self.running = self.mark_count < self.PROCESS_COUNT and \
+                       len(self.send_buffer) != 0
