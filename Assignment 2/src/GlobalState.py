@@ -20,7 +20,7 @@ class GlobalState(AbstractProcess):
         self.mark_count = 0
 
     def record_channel(self, sender: int):
-        state = f'Channel {sender} -> {self.idx} = {self.channel_state[sender]}'
+        state = f'channel {sender} -> {self.idx} = {self.channel_state[sender]}'
         self.log += f'{state}\n'
         print(state)
 
@@ -30,17 +30,17 @@ class GlobalState(AbstractProcess):
         if content != "marker":
             self.message_count += 1
             self.local_state[receiver] = (receiver_state[0] + 1, receiver_state[1])
-            print(f"SENT message {receiver_state[0]} to process #{receiver}, local state: {self.local_state}")
+            print(f"SENT message {receiver_state[0] + 1} to process #{receiver}, local state: {self.local_state}")
         else:
             print(f"MARKER SENT to {receiver}")
-        msg = Message(content, self.idx, receiver_state[0])
+        msg = Message(content, self.idx, receiver_state[0] + 1)
         await self.send_message(msg, receiver)
 
     async def record_and_send_markers(self):
         self.mark_count += 1
 
         # record local state
-        local_state = f"process{self.idx}'s state = {self.local_state}"
+        local_state = f"process{self.idx} = {self.local_state}"
         self.log += f'{local_state}\n'
         print(local_state)
 
@@ -61,11 +61,11 @@ class GlobalState(AbstractProcess):
                 # assume it is empty
                 await self.record_and_send_markers()
         else:
-            print(f"RECEIVED message {count} from process #{sender}, local state: {self.local_state}")
             sender_state = self.local_state[sender]
             self.local_state[sender] = (sender_state[0], sender_state[1] + 1)
             if self.recorded:
                 self.channel_state[sender].append(count)
+            print(f"RECEIVED message {count} from process #{sender}, local state: {self.local_state}")
 
     async def algorithm(self):
         await self.handle_receive()
@@ -76,7 +76,7 @@ class GlobalState(AbstractProcess):
             await self.send(f"msg{self.message_count}", receiver)
 
         # node 0 initializes
-        if self.idx == 0 and self.message_count == 2:
+        if self.idx == 0 and self.message_count == self.PROCESS_COUNT - 1 and not self.recorded:
             await self.record_and_send_markers()
 
         self.running = self.mark_count < self.PROCESS_COUNT or \
