@@ -2,7 +2,7 @@ from sys import argv
 from os import mkdir
 
 position = argv.index("-n") if "-n" in argv else None
-n = int(argv[position + 1]) if position is not None else 2
+n = int(argv[position + 1]) if position is not None else 3
 
 for i in range(n):
     mkdir(f'logs/node{i}')

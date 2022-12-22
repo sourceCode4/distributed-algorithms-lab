@@ -1,0 +1,183 @@
+node0:  CONTENDING for process  1
+node0:  SENT message (0, 0, 0, False) to process #1
+node4:  CONTENDING for process  0
+node4:  SENT message (0, 4, 4, False) to process #0
+node1:  CONTENDING for process  0
+node0:  RECEIVED: (0, 4), from 4
+node0:  KILLED
+node3:  CONTENDING for process  0
+node0:  SENT message (0, 4, 0, False) to process #4
+node0:  SENT message (0, 4, 0, False) to process #4
+node4:  RECEIVED: (0, 4), from 0
+node4:  CAPTURED process  0
+node5:  CONTENDING for process  0
+node3:  SENT message (0, 3, 3, False) to process #0
+node1:  SENT message (0, 1, 1, False) to process #0
+node0:  RECEIVED: (0, 3), from 3
+node0:  KILLED
+node4:  RECEIVED: (0, 4), from 0
+node4:  CONTENDING for process  1
+node5:  SENT message (0, 5, 5, False) to process #0
+node2:  CONTENDING for process  0
+node4:  SENT message (1, 4, 4, False) to process #1
+node0:  SENT message (0, 3, 0, False) to process #3
+node1:  RECEIVED: (0, 0), from 0
+node2:  SENT message (0, 2, 2, False) to process #0
+node1:  SENT message (0, 0, 1, False) to process #0
+node0:  RECEIVED: (0, 1), from 1
+node0:  KILLED
+node1:  RECEIVED: (1, 4), from 4
+node1:  KILLED
+node3:  RECEIVED: (0, 3), from 0
+node3:  CAPTURED process  0
+node1:  SENT message (1, 4, 1, False) to process #4
+node1:  SENT message (1, 4, 1, False) to process #0
+node4:  RECEIVED: (1, 4), from 1
+node4:  CAPTURED process  1
+node0:  SENT message (0, 1, 0, False) to process #1
+node3:  CONTENDING for process  1
+node3:  SENT message (1, 3, 3, False) to process #1
+node1:  RECEIVED: (0, 1), from 0
+node0:  RECEIVED: (0, 5), from 5
+node0:  KILLED
+node0:  SENT message (0, 5, 0, False) to process #5
+node5:  RECEIVED: (0, 5), from 0
+node5:  CAPTURED process  0
+node4:  CONTENDING for process  2
+node5:  CONTENDING for process  1
+node0:  SENT message (0, 5, 0, False) to process #4
+node5:  SENT message (1, 5, 5, False) to process #1
+node4:  SENT message (2, 4, 4, False) to process #2
+node1:  RECEIVED: (1, 3), from 3
+node1:  KILLED
+node1:  SENT message (1, 3, 1, False) to process #3
+node2:  RECEIVED: (2, 4), from 4
+node2:  KILLED
+node3:  RECEIVED: (1, 3), from 1
+node3:  CAPTURED process  1
+node0:  RECEIVED: (0, 2), from 2
+node0:  KILLED
+node4:  RECEIVED: (0, 5), from 0
+node1:  RECEIVED: (1, 5), from 5
+node1:  KILLED
+node0:  SENT message (0, 2, 0, False) to process #2
+node0:  RECEIVED: (0, 0), from 1
+node0:  KILLED
+node2:  SENT message (2, 4, 2, False) to process #4
+node1:  SENT message (1, 5, 1, False) to process #5
+node3:  CONTENDING for process  2
+node3:  SENT message (2, 3, 3, False) to process #2
+node1:  SENT message (1, 5, 1, False) to process #0
+node5:  RECEIVED: (1, 5), from 1
+node5:  CAPTURED process  1
+node2:  SENT message (2, 4, 2, False) to process #4
+node2:  RECEIVED: (0, 2), from 0
+node4:  RECEIVED: (2, 4), from 2
+node4:  CAPTURED process  2
+node0:  SENT message (0, 0, 0, False) to process #1
+node4:  RECEIVED: (2, 4), from 2
+node4:  CONTENDING for process  3
+node0:  RECEIVED: (1, 4), from 1
+node0:  KILLED
+node0:  SENT message (1, 4, 0, False) to process #1
+node1:  RECEIVED: (0, 0), from 0
+node0:  SENT message (1, 4, 0, False) to process #4
+node2:  RECEIVED: (2, 3), from 3
+node2:  KILLED
+node1:  RECEIVED: (1, 4), from 0
+node1:  KILLED
+node0:  RECEIVED: (1, 5), from 1
+node0:  KILLED
+node5:  CONTENDING for process  2
+node4:  SENT message (3, 4, 4, False) to process #3
+node2:  SENT message (2, 3, 2, False) to process #3
+node4:  RECEIVED: (1, 4), from 0
+node4:  CAPTURED process  3
+node0:  SENT message (1, 5, 0, False) to process #1
+node3:  RECEIVED: (3, 4), from 4
+node3:  KILLED
+node1:  SENT message (1, 4, 1, False) to process #0
+node3:  SENT message (3, 4, 3, False) to process #4
+node5:  SENT message (2, 5, 5, False) to process #2
+node1:  RECEIVED: (1, 5), from 0
+node1:  KILLED
+node0:  SENT message (1, 5, 0, False) to process #4
+node4:  RECEIVED: (3, 4), from 3
+node4:  CONTENDING for process  5
+node2:  RECEIVED: (2, 5), from 5
+node2:  KILLED
+node3:  SENT message (3, 4, 3, False) to process #4
+node0:  RECEIVED: (1, 4), from 1
+node0:  KILLED
+node3:  RECEIVED: (2, 3), from 2
+node1:  SENT message (1, 5, 1, False) to process #0
+node2:  SENT message (2, 5, 2, False) to process #5
+node0:  SENT message (1, 4, 0, False) to process #1
+node0:  RECEIVED: (1, 5), from 1
+node0:  KILLED
+node4:  SENT message (4, 4, 4, False) to process #5
+node1:  SENT message (1, 5, 1, False) to process #5
+node2:  SENT message (2, 5, 2, False) to process #4
+node5:  RECEIVED: (2, 5), from 2
+node5:  CAPTURED process  2
+node4:  RECEIVED: (1, 5), from 0
+node5:  RECEIVED: (4, 4), from 4
+node5:  CONTENDING for process  3
+node0:  SENT message (1, 5, 0, False) to process #1
+node1:  RECEIVED: (1, 4), from 0
+node1:  KILLED
+node4:  RECEIVED: (3, 4), from 3
+node4:  CAPTURED process  5
+node5:  SENT message (3, 5, 5, False) to process #3
+node1:  SENT message (1, 4, 1, False) to process #0
+node1:  RECEIVED: (1, 5), from 0
+node1:  KILLED
+node3:  RECEIVED: (3, 5), from 5
+node3:  KILLED
+node0:  SENT message (1, 5, 0, False) to process #1
+node1:  SENT message (1, 5, 1, False) to process #0
+node3:  SENT message (3, 5, 3, False) to process #5
+node5:  SENT message (4, 4, 5, False) to process #4
+node4:  RECEIVED: (2, 5), from 2
+node4:  SENT message (None, None, 4, True) to process #0
+node1:  SENT message (1, 5, 1, False) to process #5
+node3:  SENT message (3, 5, 3, False) to process #4
+node0:  RECEIVED: (1, 4), from 1
+node0:  KILLED
+node5:  RECEIVED: (1, 5), from 1
+node5:  CAPTURED process  3
+node0:  SENT message (1, 4, 0, False) to process #1
+node1:  RECEIVED: (1, 5), from 0
+node1:  KILLED
+node4:  SENT message (None, None, 4, True) to process #1
+node4:  SENT message (None, None, 4, True) to process #2
+node1:  SENT message (1, 5, 1, False) to process #0
+node5:  RECEIVED: (3, 5), from 3
+node5:  CONTENDING for process  4
+node4:  SENT message (None, None, 4, True) to process #3
+node3:  RECEIVED: (None, None), from 4
+node0:  RECEIVED: (1, 5), from 1
+node0:  KILLED
+node0:  SENT message (1, 5, 0, False) to process #1
+node2:  RECEIVED: (None, None), from 4
+node3:  DONE: elected process 4
+node4:  SENT message (None, None, 4, True) to process #4
+node1:  SENT message (1, 5, 1, False) to process #5
+node0:  SENT message (1, 5, 0, False) to process #1
+node5:  SENT message (5, 5, 5, False) to process #4
+node5:  RECEIVED: (1, 5), from 1
+node5:  CAPTURED process  4
+node0:  RECEIVED: (None, None), from 4
+node2:  DONE: elected process 4
+node4:  SENT message (None, None, 4, True) to process #5
+node1:  RECEIVED: (1, 4), from 0
+node1:  KILLED
+node5:  RECEIVED: (1, 5), from 1
+node4:  DONE: elected process 4
+node0:  DONE: elected process 4
+node5:  SENT message (None, None, 5, True) to process #0
+node5:  SENT message (None, None, 5, True) to process #1
+node1:  SENT message (1, 4, 1, False) to process #0
+node1:  RECEIVED: (None, None), from 4
+node5:  SENT message (None, None, 5, True) to process #2
+node1:  DONE: elected process 4

@@ -1,5 +1,9 @@
+import random
+
 from abstractprocess import AbstractProcess, Message
-from random import shuffle, choice
+from asyncio import sleep
+from random import shuffle
+
 
 class GlobalState(AbstractProcess):
     """
@@ -15,9 +19,11 @@ class GlobalState(AbstractProcess):
         shuffle(self.send_buffer)
         self.local_state = {k: (0, 0) for k in addresses.keys()}
         self.channel_state: dict[int, list[int]] = {k: [] for k in addresses.keys()}
-        self.message_count = 0
+        self.sent_count = 0
         self.recorded = False
         self.mark_count = 0
+        self.done = False
+        self.done_count = 1
 
     def record_channel(self, sender: int):
         state = f'channel {sender} -> {self.idx} = {self.channel_state[sender]}'
@@ -27,13 +33,13 @@ class GlobalState(AbstractProcess):
     async def send(self, content: str, receiver: int):
         receiver_state = self.local_state[receiver]
 
-        if content != "marker":
-            self.message_count += 1
+        if content == "marker" or content == "done":
+            print(f"{content.upper()} SENT to {receiver}")
+        elif receiver != self.idx:
+            self.sent_count += 1
             self.local_state[receiver] = (receiver_state[0] + 1, receiver_state[1])
-            print(f"SENT message {receiver_state[0] + 1} to process #{receiver}, local state: {self.local_state}")
-        else:
-            print(f"MARKER SENT to {receiver}")
-        msg = Message(content, self.idx, receiver_state[0] + 1)
+
+        msg = Message(content, self.idx, self.local_state[receiver][0])
         await self.send_message(msg, receiver)
 
     async def record_and_send_markers(self):
@@ -60,23 +66,33 @@ class GlobalState(AbstractProcess):
             if not self.recorded:
                 # assume it is empty
                 await self.record_and_send_markers()
-        else:
+        elif content == "done":
+            self.done_count += 1
+        elif sender != self.idx:
             sender_state = self.local_state[sender]
             self.local_state[sender] = (sender_state[0], sender_state[1] + 1)
             if self.recorded:
                 self.channel_state[sender].append(count)
-            print(f"RECEIVED message {count} from process #{sender}, local state: {self.local_state}")
+            print(f"RECEIVED message {count}: '{content}' from process #{sender}, local state: {self.local_state}")
+
+    async def handle_send(self):
+        if len(self.send_buffer) != 0:
+            receiver = self.send_buffer.pop()
+            await self.send(f"msg{self.sent_count}", receiver)
 
     async def algorithm(self):
         await self.handle_receive()
+        await self.handle_send()
 
-        # send a msg
-        if len(self.send_buffer) != 0:
-            receiver = self.send_buffer.pop()
-            await self.send(f"msg{self.message_count}", receiver)
+        # if self.idx != 0 and not self.done and len(self.send_buffer) == 0:
+        #     self.done = True
+        #     await self.send("done", 0)
 
         # node 0 initializes
-        if self.idx == 0 and self.message_count == self.PROCESS_COUNT - 1 and not self.recorded:
+        if self.idx == 0 and not self.recorded \
+                and len(self.send_buffer) <= self.PROCESS_COUNT \
+                + random.choice(range(-self.PROCESS_COUNT, self.PROCESS_COUNT)):
+            # and self.done_count == self.PROCESS_COUNT:
             await self.record_and_send_markers()
 
         self.running = self.mark_count < self.PROCESS_COUNT or \

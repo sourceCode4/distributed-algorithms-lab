@@ -11,14 +11,17 @@ class Message:
     Implementation of a message object.
     This can be changed by the student
     """
-    sender = 0
-    content = ''
-    counter = 0
+    level = -1
+    id = -1
 
-    def __init__(self, content, sender, counter):
+    def __init__(self, level, id, sender, elected=False):
+        self.level = level
+        self.id = id
         self.sender = sender
-        self.counter = counter
-        self.content = content
+        self.elected = elected
+
+    def unpack(self) -> (str, int, int):
+        return self.level, self.id, self.sender, self.elected
 
     def encode(self) -> bytes:
         """
@@ -35,7 +38,6 @@ class Message:
         :return: Message object
         """
         return jsonpickle.decode(bytestring)
-
 
 class MessageBuffer:
     """
@@ -57,7 +59,7 @@ class MessageBuffer:
     def put(self, m: Message):
         self.messages.put(m)
 
-    def get(self):
+    def get(self) -> Message:
         return self.messages.get()
 
 
@@ -72,11 +74,18 @@ class AbstractProcess(ABC):
     delay_min = 0
     delay_max = 1
 
-    def __init__(self, idx: int, addresses):
+    def __init__(self, idx: int, addresses, inits: bool):
         self.idx = idx
-        self.addresses: dict = addresses
+        self.addresses: dict[int, tuple[str, str | int]] = addresses
         self.host, self.port = self.addresses[self.idx]
         self.buffer = MessageBuffer()
+        self.untraversed = list(filter(lambda k: k != self.idx, addresses.keys())) if inits else []
+        self.winner = -1
+        self._log = str()
+
+    def log(self, msg):
+        print(msg)
+        self._log += msg + '\n'
 
     @abstractmethod
     async def algorithm(self):
@@ -115,6 +124,8 @@ class AbstractProcess(ABC):
         await writer.drain()
         writer.close()
 
+        self.log(f"SENT {m.unpack()[:2] if not m.elected else 'elected'} to {to}")
+
     async def _handle_message(self, reader, writer):
         """
         Accepts incoming messages and stores them in the message buffer.
@@ -148,13 +159,11 @@ class AbstractProcess(ABC):
             while self.running:
                 await self.algorithm()
                 await self._random_delay()
-            print('Stopping server')
             # Wait a bit for a more graceful exit of all the nodes
             await asyncio.sleep(2)
-            # print(self.log.txt)
-            with open("LogFiles/Log" + str(self.idx) + ".txt", "w") as writer:
-                print("Loggin that shizzle")
-                writer.write(self.log)
+            with open(''.join([f"/log/log{self.idx}.txt"]), "w") as writer:
+                print("Loggin that shizz")
+                writer.write(self._log)
             # Stop server
             self.server.close()
             print('Exiting')

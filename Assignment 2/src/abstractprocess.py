@@ -80,6 +80,7 @@ class AbstractProcess(ABC):
         self.addresses: dict = addresses
         self.host, self.port = self.addresses.pop(self.idx)
         self.buffer = MessageBuffer()
+        self.local_state = None
         self.log: str = ''
 
     @abstractmethod
@@ -118,6 +119,7 @@ class AbstractProcess(ABC):
         writer.write(m.encode())
         await writer.drain()
         writer.close()
+        print(f"SENT message {m.counter} to process #{to}, local state: {self.local_state}")
 
     async def _handle_message(self, reader, writer):
         """
