@@ -1,3 +1,10 @@
 0 localhost 9090
 1 localhost 9091
 2 localhost 9092
+3 localhost 9093
+4 localhost 9094
+5 localhost 9095
+6 localhost 9096
+7 localhost 9097
+8 localhost 9098
+9 localhost 9099

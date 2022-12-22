@@ -1,21 +1,27 @@
 from sys import argv
 from os import mkdir
 from random import sample
+from itertools import takewhile
 
 i_n = argv.index("n") if "n" in argv else None
-i_m = argv.index("s") + 1 if "s" in argv else None
+i_s = argv.index("s") + 1 if "s" in argv else None
 n = int(argv[i_n + 1]) if i_n is not None else 3
-if i_m is not None and i_n is not None:
-    inits = argv[i_m:] if i_m > i_n else argv[i_m:i_n]
-elif i_n is None and i_m is not None:
-    inits = argv[i_m:]
+if i_s is not None:
+    inits = takewhile(str.isnumeric, argv[i_s:])
 elif "a" in argv:
     inits = list(range(n))
 elif "r" in argv:
     inits = sample(range(n), min(int(argv[argv.index("r") + 1]), n))
 else:
     inits = [0]
-inits = list(map(int, inits))
+print(list(inits))
+if "e" in argv:
+    i_e = argv.index("e") + 1
+    exclude = takewhile(str.isnumeric, argv[i_e:])
+    print(list(exclude))
+    inits = filter(lambda node: str(node) not in exclude, inits)
+    print(list(inits))
+inits = map(int, inits)
 
 BASE_ADDRESS = 9090
 

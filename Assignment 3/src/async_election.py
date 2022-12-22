@@ -1,4 +1,6 @@
 import asyncio
+import socket
+from math import log
 
 from abstractprocess import AbstractProcess, Message
 
@@ -7,6 +9,7 @@ class Node(AbstractProcess):
     def __init__(self, idx: int, addresses: dict, inits: bool):
         super().__init__(idx, addresses, inits)
         self.level = 0
+        self.size = 0
         self.owner_id = -1
         self.owner:           int | None = None
         self.potential_owner: int | None = None
@@ -20,8 +23,8 @@ class Node(AbstractProcess):
         await self.send_message(msg, link)
 
     async def receive(self):
-        r_level, r_id, link, elected = msg = self.buffer.get().unpack()
         if self.buffer.has_messages():
+            r_level, r_id, link, elected = msg = self.buffer.get().unpack()
             self.log(f'RECEIVED {r_level, r_id} from {link}' if not elected
                      else f'ELECTED {link}')
             return msg
@@ -29,7 +32,7 @@ class Node(AbstractProcess):
             return None
 
     async def announce(self):
-        for link in self.addresses.keys():
+        for link in filter(lambda k: k != self.idx, self.addresses.keys()):
             await self.send_message(Message(None, None, self.idx, True), link)
         self.winner = self.idx
         self.running = False
@@ -43,18 +46,19 @@ class Node(AbstractProcess):
                 await self.announce()
         elif self.link < 0:
             self.link = self.untraversed[0]
-            self.log(f'CONTENDING for process {self.link}')
+            self.log(f'CAPTURING {self.link}')
             await self.send(self.level, self.idx, self.link)
         else:
             if r_id == self.idx and not self.killed:
-                self.log(f'CAPTURED process {self.untraversed[0]}')
-                self.level += 1
+                self.log(f'CAPTURED {self.untraversed[0]}')
+                self.size += 1
+                self.level = max(r_level, log(self.size))
                 self.untraversed.pop(0)
                 self.link = -1      # == no goto
             elif (r_level, r_id) < (self.level, self.idx):
                 return  # == goto
             else:
-                self.log(f'KILLED by {r_link}')
+                self.log(f'OK to {r_link}')    # killed
                 await self.send(r_level, r_id, r_link)
                 self.killed = True
                 return  # == goto
@@ -63,15 +67,17 @@ class Node(AbstractProcess):
         if (r_level, r_id) < (self.level, self.owner_id):
             return
         elif (r_level, r_id) > (self.level, self.owner_id):
-            self.log(f'CAPTURED BY {r_link}')
             self.potential_owner = r_link
             self.level, self.owner_id = r_level, r_id
             if self.owner is None:
                 self.owner = self.potential_owner
-            await self.send(r_level, r_id, self.owner_id)
+            else:
+                self.log(f'KILL {r_link}')
+            await self.send(r_level, r_id, self.owner)
         else:
+            self.log(f'ACK to {self.owner_id}')
             self.owner = self.potential_owner
-            await self.send(r_level, r_id, self.owner_id)
+            await self.send(r_level, r_id, self.owner)
 
     async def algorithm(self) -> None:
         if self.initiating:

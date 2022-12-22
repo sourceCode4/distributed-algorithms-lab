@@ -36,7 +36,7 @@ async def run_process(pid: int, inits: bool):
     # Start server for incomming connections
     await p.start_server()
     # Wait a bit for all processes to start up
-    await asyncio.sleep(2)
+    await asyncio.sleep(3)
     # Run algorithm until finished
     await p.run()
 

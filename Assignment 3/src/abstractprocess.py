@@ -160,7 +160,7 @@ class AbstractProcess(ABC):
                 await self.algorithm()
                 await self._random_delay()
             # Wait a bit for a more graceful exit of all the nodes
-            await asyncio.sleep(2)
+            await asyncio.sleep(5)
             with open(''.join([f"/log/log{self.idx}.txt"]), "w") as writer:
                 print("Loggin that shizz")
                 writer.write(self._log)
